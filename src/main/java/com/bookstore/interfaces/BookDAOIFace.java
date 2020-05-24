@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface BookDAOIFace {
 
-    public void addBook(Book book);
+    public Book addBook(Book book);
 
     public void updateBook(Book book);
 

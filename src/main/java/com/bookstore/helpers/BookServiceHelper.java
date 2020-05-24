@@ -1,11 +1,13 @@
 package com.bookstore.helpers;
 
 import com.bookstore.entity.Book;
+import com.bookstore.entity.Inventory;
 import com.bookstore.exceptions.ResourceNotFoundException;
 import com.bookstore.exceptions.ValidationException;
 import com.bookstore.interfaces.BookDAOIFace;
 import com.bookstore.requests.BookAddRequest;
 import com.bookstore.requests.BookUpdateRequest;
+import com.bookstore.responses.BookResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -63,5 +65,27 @@ public class BookServiceHelper {
 
     public void validateBookDeleteRequest(Integer id) throws ResourceNotFoundException {
         validateBookExistsInDB(id);
+    }
+
+    public Inventory getInventoryFromRequest(BookAddRequest bookAddRequest, Book bookInDB) {
+
+        Inventory inventory = new Inventory();
+        inventory.setBookId(bookInDB.getId());
+        inventory.setNoOfCopies(bookAddRequest.getInventory()!=null ? bookAddRequest.getInventory() : 0);
+
+        return  inventory;
+    }
+
+    public BookResponse generateBookResponse(Book bookInDB, Inventory inventory) {
+
+        BookResponse addBookRespone = new BookResponse();
+        addBookRespone.setAuthor(bookInDB.getAuthor());
+        addBookRespone.setId(bookInDB.getId());
+        addBookRespone.setIsbn(bookInDB.getIsbn());
+        addBookRespone.setTitle(bookInDB.getTitle());
+        addBookRespone.setPrice(bookInDB.getPrice());
+        addBookRespone.setNoOfCopies(inventory.getNoOfCopies());
+
+        return addBookRespone;
     }
 }

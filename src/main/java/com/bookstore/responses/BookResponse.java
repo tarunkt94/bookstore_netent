@@ -1,28 +1,17 @@
-package com.bookstore.entity;
+package com.bookstore.responses;
 
-import javax.persistence.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
-@Entity
-@Table(name = "books",schema = "bookstore")
-public class Book {
+@ResponseStatus(HttpStatus.ACCEPTED)
+public class BookResponse {
 
-    @Id
-    @Column(columnDefinition = "serial")
-    @GeneratedValue
     private Integer id;
-
-    @Column
-    private String isbn;
-
-    @Column
     private String title;
-
-    @Column
     private String author;
-
-    @Column
+    private String isbn;
     private Float price;
-
+    private Integer noOfCopies;
 
     public Integer getId() {
         return id;
@@ -30,14 +19,6 @@ public class Book {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public String getIsbn() {
-        return isbn;
-    }
-
-    public void setIsbn(String isbn) {
-        this.isbn = isbn;
     }
 
     public String getTitle() {
@@ -56,11 +37,27 @@ public class Book {
         this.author = author;
     }
 
+    public String getIsbn() {
+        return isbn;
+    }
+
+    public void setIsbn(String isbn) {
+        this.isbn = isbn;
+    }
+
     public Float getPrice() {
         return price;
     }
 
     public void setPrice(Float price) {
         this.price = price;
+    }
+
+    public Integer getNoOfCopies() {
+        return noOfCopies;
+    }
+
+    public void setNoOfCopies(Integer noOfCopies) {
+        this.noOfCopies = noOfCopies;
     }
 }

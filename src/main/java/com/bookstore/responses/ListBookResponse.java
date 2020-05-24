@@ -6,17 +6,17 @@ import java.util.List;
 
 public class ListBookResponse {
 
-    public ListBookResponse(List<Book> books) {
+    List<BookResponse> books;
+
+    public ListBookResponse(List<BookResponse> books) {
         this.books = books;
     }
 
-    List<Book> books;
-
-    public List<Book> getBooks() {
+    public List<BookResponse> getBooks() {
         return books;
     }
 
-    public void setBooks(List<Book> books) {
+    public void setBooks(List<BookResponse> books) {
         this.books = books;
     }
 }

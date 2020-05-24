@@ -3,15 +3,18 @@ package com.bookstore.responses;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-public class GenericResponse {
+@ResponseStatus(HttpStatus.ACCEPTED)
+public class BuyBookResponse {
 
+    boolean success;
     String msg;
 
-    public GenericResponse() {
+    public boolean isSuccess() {
+        return success;
     }
 
-    public GenericResponse(String msg) {
-        this.msg = msg;
+    public void setSuccess(boolean success) {
+        this.success = success;
     }
 
     public String getMsg() {

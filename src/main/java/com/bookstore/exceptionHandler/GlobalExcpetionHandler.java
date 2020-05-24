@@ -7,14 +7,18 @@ import com.bookstore.responses.GenericResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
+@EnableWebMvc
 @ControllerAdvice
+@ResponseBody
 public class GlobalExcpetionHandler {
 
 
     @ExceptionHandler(value = ValidationException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
     public GenericResponse ValidationExceptionHandler(ValidationException vEx){
         return new GenericResponse(vEx.getMessage());
     }

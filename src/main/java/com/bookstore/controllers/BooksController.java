@@ -7,6 +7,7 @@ import com.bookstore.exceptions.ValidationException;
 import com.bookstore.requests.BookAddRequest;
 import com.bookstore.requests.BookPartialSearchRequest;
 import com.bookstore.requests.BookUpdateRequest;
+import com.bookstore.responses.BookResponse;
 import com.bookstore.responses.ListBookResponse;
 import com.bookstore.responses.SuccessResponse;
 import com.bookstore.service.BooksService;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@ResponseBody
 @RequestMapping(value = "/books")
 public class BooksController {
 
@@ -23,22 +25,19 @@ public class BooksController {
     BooksService booksService;
 
     @RequestMapping(method = RequestMethod.POST)
-    public Book addBook(BookAddRequest bookAddRequest) throws ValidationException, InternalServerException {
+    public BookResponse addBook(@RequestBody  BookAddRequest bookAddRequest) throws ValidationException {
         return booksService.addBook(bookAddRequest);
     }
 
     @RequestMapping(method = RequestMethod.GET,value = "/{id}")
-    public Book getBook(@PathVariable Integer id) throws ResourceNotFoundException,InternalServerException{
-        Book book = booksService.getBookById(id);
-
-        if(book==null) throw new ResourceNotFoundException();
-        return book;
+    public BookResponse getBook(@PathVariable Integer id) throws ResourceNotFoundException{
+        return booksService.getBook(id);
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public ListBookResponse getBook(@RequestParam String isbn, @RequestParam String author, @RequestParam String title) throws InternalServerException{
+    public ListBookResponse getBooks(@RequestParam String isbn, @RequestParam String author, @RequestParam String title) throws InternalServerException{
         BookPartialSearchRequest partialSearchRequest = new BookPartialSearchRequest(isbn,title,author);
-        List<Book> books = booksService.findBooks(partialSearchRequest);
+        List<BookResponse> books = booksService.findBooks(partialSearchRequest);
         return new ListBookResponse(books);
     }
 

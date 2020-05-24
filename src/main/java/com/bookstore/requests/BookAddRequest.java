@@ -1,13 +1,12 @@
 package com.bookstore.requests;
 
-import com.bookstore.entity.Book;
-
 public class BookAddRequest {
 
     private String isbn;
     private String title;
     private String author;
     private Float price;
+    private Integer inventory;
 
     public String getIsbn() {
         return isbn;
@@ -41,4 +40,11 @@ public class BookAddRequest {
         this.price = price;
     }
 
+    public Integer getInventory() {
+        return inventory;
+    }
+
+    public void setInventory(Integer inventory) {
+        this.inventory = inventory;
+    }
 }
