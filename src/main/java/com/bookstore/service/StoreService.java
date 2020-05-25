@@ -38,11 +38,17 @@ public class StoreService {
         return helper.generateSuccessReponse();
     }
 
-    private void decreaseInventory(Inventory bookInventory,Integer noOfCopies) {
+    private void decreaseInventory(Inventory bookInventory,Integer noOfCopiesToBuy) {
 
-        bookInventory.setNoOfCopies(bookInventory.getNoOfCopies()-noOfCopies);
+        int finalNumberOfCopies = getNoOfCopiesAfterBuying(bookInventory,noOfCopiesToBuy);
+        bookInventory.setNoOfCopies(finalNumberOfCopies);
         inventoryService.saveInventory(bookInventory);
 
+    }
+
+    private int getNoOfCopiesAfterBuying(Inventory bookInventory, Integer noOfCopiesToBuy) {
+        if(bookInventory.getNoOfCopies()==noOfCopiesToBuy) return 1;
+        return bookInventory.getNoOfCopies()-noOfCopiesToBuy;
     }
 
     private Inventory getBookInventory(Integer id) {

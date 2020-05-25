@@ -9,6 +9,7 @@ import com.bookstore.requests.BookPartialSearchRequest;
 import com.bookstore.requests.BookUpdateRequest;
 import com.bookstore.responses.BookResponse;
 import com.bookstore.responses.ListBookResponse;
+import com.bookstore.responses.MediaCoverageResponse;
 import com.bookstore.responses.SuccessResponse;
 import com.bookstore.service.BooksService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,9 @@ public class BooksController {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public ListBookResponse getBooks(@RequestParam String isbn, @RequestParam String author, @RequestParam String title) throws InternalServerException{
+    public ListBookResponse getBooks(@RequestParam(required = false) String isbn,
+                                     @RequestParam(required = false) String author,
+                                     @RequestParam(required = false) String title){
         BookPartialSearchRequest partialSearchRequest = new BookPartialSearchRequest(isbn,title,author);
         List<BookResponse> books = booksService.findBooks(partialSearchRequest);
         return new ListBookResponse(books);
@@ -48,8 +51,13 @@ public class BooksController {
     }
 
     @RequestMapping(value = "/{id}",method = RequestMethod.DELETE)
-    public SuccessResponse deleteBook(@PathVariable Integer id) throws ResourceNotFoundException,InternalServerException{
+    public SuccessResponse deleteBook(@PathVariable Integer id) throws ResourceNotFoundException{
         booksService.deleteBook(id);
         return new SuccessResponse();
+    }
+
+    @RequestMapping(value = "/getMediaCoverage",method = RequestMethod.GET)
+    public MediaCoverageResponse getMediaCoverage(@RequestParam String isbn) throws ValidationException{
+        return booksService.getMediaCoverage(isbn);
     }
 }

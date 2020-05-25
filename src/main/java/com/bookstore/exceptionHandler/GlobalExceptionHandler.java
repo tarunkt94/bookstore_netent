@@ -14,7 +14,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @EnableWebMvc
 @ControllerAdvice
 @ResponseBody
-public class GlobalExcpetionHandler {
+public class GlobalExceptionHandler {
 
 
     @ExceptionHandler(value = ValidationException.class)
@@ -33,4 +33,5 @@ public class GlobalExcpetionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public void resourceNotFoundException(ResourceNotFoundException rNFEx){
     }
+
 }

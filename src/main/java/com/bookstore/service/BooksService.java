@@ -2,15 +2,16 @@ package com.bookstore.service;
 
 import com.bookstore.entity.Book;
 import com.bookstore.entity.Inventory;
-import com.bookstore.exceptions.InternalServerException;
 import com.bookstore.exceptions.ResourceNotFoundException;
 import com.bookstore.exceptions.ValidationException;
 import com.bookstore.helpers.BookServiceHelper;
 import com.bookstore.interfaces.BookDAOIFace;
+import com.bookstore.pojos.MediaCoverage;
 import com.bookstore.requests.BookAddRequest;
 import com.bookstore.requests.BookPartialSearchRequest;
 import com.bookstore.requests.BookUpdateRequest;
 import com.bookstore.responses.BookResponse;
+import com.bookstore.responses.MediaCoverageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -51,6 +52,8 @@ public class BooksService {
 
 
     public List<BookResponse> findBooks(BookPartialSearchRequest partialSearchRequest) {
+
+        bookServiceHelper.modifyRequest(partialSearchRequest);
         List<Book> books = bookDAO.findBooks(partialSearchRequest);
 
         return generateBookResponse(books);
@@ -94,6 +97,41 @@ public class BooksService {
         Inventory inventory = inventoryService.getInventoryByBookId(book.getId());
 
         return bookServiceHelper.generateBookResponse(book,inventory);
+
+    }
+
+    public MediaCoverageResponse getMediaCoverage(String isbn) throws ValidationException {
+
+        if(isbn==null || isbn.isEmpty()) throw new ValidationException("Request parameter 'isbn' cant be empty");
+
+        Book bookInDB = getBookByISBN(isbn);
+
+        if(bookInDB==null) return bookServiceHelper.generateUnavailableBookMediaCoverageResponse();
+
+        List<MediaCoverage> mediaCoverageList = getMediaCoverage(bookInDB);
+
+        return bookServiceHelper.generateMediaCoverageResponse(mediaCoverageList);
+    }
+
+    private List<MediaCoverage> getMediaCoverage(Book bookInDB) {
+
+        List<MediaCoverage> allMediaCoverage = bookServiceHelper.getAllMediaCoverage();
+
+        List<MediaCoverage> response =  new ArrayList<>();
+
+        for(MediaCoverage mediaCoverage : allMediaCoverage){
+            if(mediaCoverage.getTitle().contains(bookInDB.getTitle())
+                || mediaCoverage.getBody().contains(bookInDB.getTitle())){
+                response.add(mediaCoverage);
+            }
+        }
+
+        return response;
+    }
+
+    private Book getBookByISBN(String isbn) {
+
+        return bookDAO.getBookByISBN(isbn);
 
     }
 }

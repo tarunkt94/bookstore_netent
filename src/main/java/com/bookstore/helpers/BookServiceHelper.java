@@ -1,21 +1,41 @@
 package com.bookstore.helpers;
 
+import com.bookstore.config.Constants;
 import com.bookstore.entity.Book;
 import com.bookstore.entity.Inventory;
 import com.bookstore.exceptions.ResourceNotFoundException;
 import com.bookstore.exceptions.ValidationException;
 import com.bookstore.interfaces.BookDAOIFace;
+import com.bookstore.pojos.MediaCoverage;
 import com.bookstore.requests.BookAddRequest;
+import com.bookstore.requests.BookPartialSearchRequest;
 import com.bookstore.requests.BookUpdateRequest;
 import com.bookstore.responses.BookResponse;
+import com.bookstore.responses.MediaCoverageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import javax.print.attribute.standard.Media;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class BookServiceHelper {
 
     @Autowired
     BookDAOIFace bookDAO;
+
+    @Autowired
+    RestTemplate restTemplate;
+
+    @Value("${media.coverage.url}")
+    String mediaCoverageURL;
 
     public void validateBookAddRequest(BookAddRequest bookAddRequest) throws ValidationException {
 
@@ -78,14 +98,58 @@ public class BookServiceHelper {
 
     public BookResponse generateBookResponse(Book bookInDB, Inventory inventory) {
 
-        BookResponse addBookRespone = new BookResponse();
-        addBookRespone.setAuthor(bookInDB.getAuthor());
-        addBookRespone.setId(bookInDB.getId());
-        addBookRespone.setIsbn(bookInDB.getIsbn());
-        addBookRespone.setTitle(bookInDB.getTitle());
-        addBookRespone.setPrice(bookInDB.getPrice());
-        addBookRespone.setNoOfCopies(inventory.getNoOfCopies());
+        BookResponse addBookResponse = new BookResponse();
+        addBookResponse.setAuthor(bookInDB.getAuthor());
+        addBookResponse.setId(bookInDB.getId());
+        addBookResponse.setIsbn(bookInDB.getIsbn());
+        addBookResponse.setTitle(bookInDB.getTitle());
+        addBookResponse.setPrice(bookInDB.getPrice());
+        addBookResponse.setNoOfCopies(inventory.getNoOfCopies());
 
-        return addBookRespone;
+        return addBookResponse;
+    }
+
+    public List<MediaCoverage> getAllMediaCoverage() {
+
+        ResponseEntity<List<MediaCoverage>> responseEntity ;
+        List<MediaCoverage> response = new ArrayList<>();
+
+        try{
+            responseEntity = restTemplate.exchange(mediaCoverageURL, HttpMethod.GET,
+                    new HttpEntity<>(null),new ParameterizedTypeReference<List<MediaCoverage>>(){});
+            return responseEntity.getBody();
+        }
+        catch(Exception ex){
+            //log error message
+            return response;
+        }
+    }
+
+    public MediaCoverageResponse generateUnavailableBookMediaCoverageResponse() {
+        MediaCoverageResponse mediaCoverageResponse = new MediaCoverageResponse();
+        mediaCoverageResponse.setSuccess(false);
+        mediaCoverageResponse.setMsg("No book exists in the system with given ISBN");
+
+        return mediaCoverageResponse;
+    }
+
+    public MediaCoverageResponse generateMediaCoverageResponse(List<MediaCoverage> mediaCoverageList) {
+
+        MediaCoverageResponse response = new MediaCoverageResponse();
+        response.setSuccess(true);
+        response.setTitleList(getTitleList(mediaCoverageList));
+        return response;
+    }
+
+    private List<String> getTitleList(List<MediaCoverage> mediaCoverageList) {
+        List<String> response = new ArrayList<>();
+        for(MediaCoverage mediaCoverage: mediaCoverageList) response.add(mediaCoverage.getTitle());
+        return response;
+    }
+
+    public void modifyRequest(BookPartialSearchRequest partialSearchRequest) {
+        if(partialSearchRequest.getAuthor()==null) partialSearchRequest.setAuthor(Constants.EMPTY_STRING);
+        if(partialSearchRequest.getIsbn()==null) partialSearchRequest.setIsbn(Constants.EMPTY_STRING);
+        if(partialSearchRequest.getTitle()==null) partialSearchRequest.setTitle(Constants.EMPTY_STRING);
     }
 }

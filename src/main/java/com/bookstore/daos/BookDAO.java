@@ -47,6 +47,9 @@ public class BookDAO implements BookDAOIFace {
 
     @Override
     public List<Book> findBooks(BookPartialSearchRequest partialSearchRequest) {
-        return null;
+        if(partialSearchRequest.getIsbn().isEmpty())
+            return booksRepo.findBooks(partialSearchRequest.getTitle(),partialSearchRequest.getAuthor());
+        else
+            return booksRepo.findBooks(partialSearchRequest.getTitle(),partialSearchRequest.getAuthor(),partialSearchRequest.getIsbn());
     }
 }
