@@ -12,6 +12,7 @@ import com.bookstore.requests.BookPartialSearchRequest;
 import com.bookstore.requests.BookUpdateRequest;
 import com.bookstore.responses.BookResponse;
 import com.bookstore.responses.MediaCoverageResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Slf4j
 public class BooksService {
 
     @Autowired
@@ -37,11 +39,17 @@ public class BooksService {
 
         bookDAO.addBook(bookInDB);
 
-        Inventory inventory =  bookServiceHelper.getInventoryFromRequest(bookAddRequest,bookInDB);
-
-        inventoryService.saveInventory(inventory);
+        Inventory inventory =  addInventoryInDB(bookAddRequest,bookInDB);
 
         return bookServiceHelper.generateBookResponse(bookInDB,inventory);
+    }
+
+    private Inventory addInventoryInDB(BookAddRequest bookAddRequest, Book bookInDB) {
+
+        Inventory inventory = bookServiceHelper.getInventoryFromRequest(bookAddRequest,bookInDB);
+        inventoryService.saveInventory(inventory);
+        return inventory;
+
     }
 
 
@@ -125,13 +133,10 @@ public class BooksService {
                 response.add(mediaCoverage);
             }
         }
-
         return response;
     }
 
     private Book getBookByISBN(String isbn) {
-
         return bookDAO.getBookByISBN(isbn);
-
     }
 }

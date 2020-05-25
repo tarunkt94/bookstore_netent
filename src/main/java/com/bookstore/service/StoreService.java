@@ -6,11 +6,8 @@ import com.bookstore.exceptions.ValidationException;
 import com.bookstore.helpers.StoreServiceHelper;
 import com.bookstore.requests.BuyBookRequest;
 import com.bookstore.responses.BuyBookResponse;
-import org.hibernate.annotations.Synchronize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import javax.transaction.Transactional;
 
 @Service
 public class StoreService {
@@ -24,7 +21,6 @@ public class StoreService {
     @Autowired
     InventoryService inventoryService;
 
-    @Transactional
     public synchronized BuyBookResponse buyBook(BuyBookRequest buyBookRequest) throws ValidationException {
 
         Book bookInDB = helper.validateRequestAndGetBook(buyBookRequest);
