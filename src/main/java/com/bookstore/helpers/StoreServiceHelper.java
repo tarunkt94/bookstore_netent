@@ -1,6 +1,7 @@
 package com.bookstore.helpers;
 
 import com.bookstore.entity.Book;
+import com.bookstore.exceptions.InternalServerException;
 import com.bookstore.exceptions.ValidationException;
 import com.bookstore.interfaces.BookDAOIFace;
 import com.bookstore.requests.BuyBookRequest;
@@ -18,7 +19,7 @@ public class StoreServiceHelper {
     @Autowired
     BooksService booksService;
 
-    public Book validateRequestAndGetBook(BuyBookRequest buyBookRequest) throws ValidationException {
+    public Book validateRequestAndGetBook(BuyBookRequest buyBookRequest) throws ValidationException, InternalServerException {
 
         Integer bookId = buyBookRequest.getBookId();
         if(bookId==null) throw new ValidationException("bookId cannot be null in the request");

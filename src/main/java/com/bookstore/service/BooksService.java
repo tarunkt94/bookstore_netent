@@ -2,6 +2,8 @@ package com.bookstore.service;
 
 import com.bookstore.entity.Book;
 import com.bookstore.entity.Inventory;
+import com.bookstore.exceptions.DBException;
+import com.bookstore.exceptions.InternalServerException;
 import com.bookstore.exceptions.ResourceNotFoundException;
 import com.bookstore.exceptions.ValidationException;
 import com.bookstore.helpers.BookServiceHelper;
@@ -32,37 +34,57 @@ public class BooksService {
     @Autowired
     InventoryService inventoryService;
 
-    public BookResponse addBook(BookAddRequest bookAddRequest) throws ValidationException {
+    public BookResponse addBook(BookAddRequest bookAddRequest) throws ValidationException, InternalServerException {
 
         bookServiceHelper.validateBookAddRequest(bookAddRequest);
         Book bookInDB = bookServiceHelper.getBookFromAddRequest(bookAddRequest);
 
-        bookDAO.addBook(bookInDB);
+        try{
+            bookDAO.addBook(bookInDB);
+        }
+        catch(DBException dbEx){
+            log.error("Exception while trying to save book in DB : " + bookInDB, dbEx );
+            throw new InternalServerException();
+        }
 
         Inventory inventory =  addInventoryInDB(bookAddRequest,bookInDB);
 
         return bookServiceHelper.generateBookResponse(bookInDB,inventory);
     }
 
-    private Inventory addInventoryInDB(BookAddRequest bookAddRequest, Book bookInDB) {
+    private Inventory addInventoryInDB(BookAddRequest bookAddRequest, Book bookInDB) throws InternalServerException {
 
         Inventory inventory = bookServiceHelper.getInventoryFromRequest(bookAddRequest,bookInDB);
         inventoryService.saveInventory(inventory);
         return inventory;
-
     }
 
 
-    public Book getBookById(Integer id){
+    public Book getBookById(Integer id) throws InternalServerException {
         if(id==null) return null;
-        return bookDAO.getBook(id);
+        try{
+            return bookDAO.getBook(id);
+        }
+        catch(DBException ex){
+            log.error("Exception while trying to get book by id : " + id);
+            throw new InternalServerException();
+        }
     }
 
 
-    public List<BookResponse> findBooks(BookPartialSearchRequest partialSearchRequest) {
+    public List<BookResponse> findBooks(BookPartialSearchRequest partialSearchRequest) throws InternalServerException {
 
         bookServiceHelper.modifyRequest(partialSearchRequest);
-        List<Book> books = bookDAO.findBooks(partialSearchRequest);
+
+        List<Book> books;
+
+        try{
+            books = bookDAO.findBooks(partialSearchRequest);
+        }
+        catch(DBException dBEx){
+            log.error("Exception while trying to findBooks with partial request : " + partialSearchRequest,dBEx);
+            throw new InternalServerException();
+        }
 
         return generateBookResponse(books);
 
@@ -73,31 +95,50 @@ public class BooksService {
         List<BookResponse> response =  new ArrayList<>();
 
         for(Book book : books){
-            Inventory inventoryInDB = inventoryService.getInventoryByBookId(book.getId());
-            response.add(bookServiceHelper.generateBookResponse(book,inventoryInDB));
+            try{
+                Inventory inventoryInDB = inventoryService.getInventoryByBookId(book.getId());
+                response.add(bookServiceHelper.generateBookResponse(book,inventoryInDB));
+            }
+            catch(InternalServerException iSEx){
+                log.error("Exception while trying to get inventory for bookId : " + book.getId(),iSEx);
+            }
         }
 
         return response;
     }
 
-    public void updateBook(Integer id, BookUpdateRequest bookUpdateRequest) throws ResourceNotFoundException {
+    public void updateBook(Integer id, BookUpdateRequest bookUpdateRequest) throws ResourceNotFoundException, InternalServerException {
 
         bookServiceHelper.validateBookUpdateRequest(id);
-        Book bookInDb = bookDAO.getBook(id);
-        bookServiceHelper.updateBookDetails(bookInDb,bookUpdateRequest);
-        bookDAO.saveBook(bookInDb);
+
+        try{
+            Book bookInDb = bookDAO.getBook(id);
+            bookServiceHelper.updateBookDetails(bookInDb,bookUpdateRequest);
+            bookDAO.saveBook(bookInDb);
+        }
+        catch(DBException dbEx){
+            log.error("Exception while trying to update book : " , dbEx);
+            throw new InternalServerException();
+        }
     }
 
-    public void deleteBook(Integer id) throws  ResourceNotFoundException{
+    public void deleteBook(Integer id) throws ResourceNotFoundException, InternalServerException {
 
         bookServiceHelper.validateBookDeleteRequest(id);
 
-        Book bookInDB = bookDAO.getBook(id);
-        bookDAO.deleteBook(bookInDB);
+        inventoryService.deleteInventoryOfBook(id);
+
+        try{
+            bookDAO.deleteBook(id);
+        }
+        catch(DBException dBEx){
+            log.error("Exception while trying to delete book with id : " + id,dBEx);
+            throw new InternalServerException();
+        }
 
     }
 
-    public BookResponse getBook(Integer id) throws ResourceNotFoundException {
+    public BookResponse getBook(Integer id) throws ResourceNotFoundException, InternalServerException {
 
         Book book = getBookById(id);
         if(book == null) throw new ResourceNotFoundException();
@@ -108,7 +149,7 @@ public class BooksService {
 
     }
 
-    public MediaCoverageResponse getMediaCoverage(String isbn) throws ValidationException {
+    public MediaCoverageResponse getMediaCoverage(String isbn) throws ValidationException, InternalServerException {
 
         if(isbn==null || isbn.isEmpty()) throw new ValidationException("Request parameter 'isbn' cant be empty");
 
@@ -136,7 +177,13 @@ public class BooksService {
         return response;
     }
 
-    private Book getBookByISBN(String isbn) {
-        return bookDAO.getBookByISBN(isbn);
+    private Book getBookByISBN(String isbn) throws InternalServerException {
+        try{
+            return bookDAO.getBookByISBN(isbn);
+        }
+        catch(DBException dbEx){
+            log.error("Exception while trying to get book by ISBN " + isbn,dbEx);
+            throw new InternalServerException();
+        }
     }
 }

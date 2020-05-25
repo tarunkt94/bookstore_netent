@@ -2,6 +2,7 @@ package com.bookstore.service;
 
 import com.bookstore.entity.Book;
 import com.bookstore.entity.Inventory;
+import com.bookstore.exceptions.InternalServerException;
 import com.bookstore.exceptions.ValidationException;
 import com.bookstore.helpers.StoreServiceHelper;
 import com.bookstore.requests.BuyBookRequest;
@@ -21,7 +22,7 @@ public class StoreService {
     @Autowired
     InventoryService inventoryService;
 
-    public synchronized BuyBookResponse buyBook(BuyBookRequest buyBookRequest) throws ValidationException {
+    public synchronized BuyBookResponse buyBook(BuyBookRequest buyBookRequest) throws ValidationException, InternalServerException {
 
         Book bookInDB = helper.validateRequestAndGetBook(buyBookRequest);
 
@@ -34,7 +35,7 @@ public class StoreService {
         return helper.generateSuccessReponse();
     }
 
-    private void decreaseInventory(Inventory bookInventory,Integer noOfCopiesToBuy) {
+    private void decreaseInventory(Inventory bookInventory,Integer noOfCopiesToBuy) throws InternalServerException {
 
         int finalNumberOfCopies = getNoOfCopiesAfterBuying(bookInventory,noOfCopiesToBuy);
         bookInventory.setNoOfCopies(finalNumberOfCopies);
@@ -47,7 +48,7 @@ public class StoreService {
         return bookInventory.getNoOfCopies()-noOfCopiesToBuy;
     }
 
-    private Inventory getBookInventory(Integer id) {
+    private Inventory getBookInventory(Integer id) throws InternalServerException {
         return inventoryService.getInventoryByBookId(id);
     }
 }

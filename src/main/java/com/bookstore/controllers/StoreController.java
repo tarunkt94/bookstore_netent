@@ -1,6 +1,7 @@
 package com.bookstore.controllers;
 
 import com.bookstore.entity.Book;
+import com.bookstore.exceptions.InternalServerException;
 import com.bookstore.exceptions.ValidationException;
 import com.bookstore.requests.BuyBookRequest;
 import com.bookstore.responses.BuyBookResponse;
@@ -22,7 +23,7 @@ public class StoreController {
 
     @RequestMapping(method = RequestMethod.POST,value = "/buyBook")
     @Transactional
-    public BuyBookResponse buyBook(@RequestBody BuyBookRequest buyBookRequest) throws ValidationException {
+    public BuyBookResponse buyBook(@RequestBody BuyBookRequest buyBookRequest) throws ValidationException, InternalServerException {
         return storeService.buyBook(buyBookRequest);
     }
 

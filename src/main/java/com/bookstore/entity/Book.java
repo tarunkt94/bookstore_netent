@@ -1,14 +1,17 @@
 package com.bookstore.entity;
 
+import lombok.ToString;
+
 import javax.persistence.*;
 
 @Entity
 @Table(name = "books",schema = "bookstore")
+@ToString
 public class Book {
 
     @Id
     @Column(columnDefinition = "serial")
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column

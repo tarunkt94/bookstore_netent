@@ -28,19 +28,19 @@ public class BooksController {
 
     @RequestMapping(method = RequestMethod.POST)
     @Transactional
-    public BookResponse addBook(@RequestBody  BookAddRequest bookAddRequest) throws ValidationException {
+    public BookResponse addBook(@RequestBody  BookAddRequest bookAddRequest) throws ValidationException, InternalServerException {
         return booksService.addBook(bookAddRequest);
     }
 
     @RequestMapping(method = RequestMethod.GET,value = "/{id}")
-    public BookResponse getBook(@PathVariable Integer id) throws ResourceNotFoundException{
+    public BookResponse getBook(@PathVariable Integer id) throws ResourceNotFoundException, InternalServerException {
         return booksService.getBook(id);
     }
 
     @RequestMapping(method = RequestMethod.GET)
     public ListBookResponse getBooks(@RequestParam(required = false) String isbn,
                                      @RequestParam(required = false) String author,
-                                     @RequestParam(required = false) String title){
+                                     @RequestParam(required = false) String title) throws InternalServerException {
         BookPartialSearchRequest partialSearchRequest = new BookPartialSearchRequest(isbn,title,author);
         List<BookResponse> books = booksService.findBooks(partialSearchRequest);
         return new ListBookResponse(books);
@@ -55,13 +55,13 @@ public class BooksController {
 
     @RequestMapping(value = "/{id}",method = RequestMethod.DELETE)
     @Transactional
-    public SuccessResponse deleteBook(@PathVariable Integer id) throws ResourceNotFoundException{
+    public SuccessResponse deleteBook(@PathVariable Integer id) throws ResourceNotFoundException, InternalServerException {
         booksService.deleteBook(id);
         return new SuccessResponse();
     }
 
     @RequestMapping(value = "/getMediaCoverage",method = RequestMethod.GET)
-    public MediaCoverageResponse getMediaCoverage(@RequestParam String isbn) throws ValidationException{
+    public MediaCoverageResponse getMediaCoverage(@RequestParam String isbn) throws ValidationException, InternalServerException {
         return booksService.getMediaCoverage(isbn);
     }
 }

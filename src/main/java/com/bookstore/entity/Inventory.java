@@ -1,13 +1,16 @@
 package com.bookstore.entity;
 
+import lombok.ToString;
+
 import javax.persistence.*;
 
 @Entity
 @Table(name = "inventory",schema = "bookstore")
+@ToString
 public class Inventory {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
 
     @Column(name = "book_id")

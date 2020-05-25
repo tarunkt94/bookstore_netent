@@ -1,5 +1,8 @@
 package com.bookstore.requests;
 
+import lombok.ToString;
+
+@ToString
 public class BookPartialSearchRequest {
 
     private String isbn;

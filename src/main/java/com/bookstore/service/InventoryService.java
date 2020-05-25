@@ -1,32 +1,52 @@
 package com.bookstore.service;
 
 import com.bookstore.entity.Inventory;
-import com.bookstore.exceptions.ResourceNotFoundException;
-import com.bookstore.exceptions.ValidationException;
-import com.bookstore.helpers.InventoryServiceHelper;
+import com.bookstore.exceptions.DBException;
+import com.bookstore.exceptions.InternalServerException;
 import com.bookstore.interfaces.InventoryDAOIFace;
-import com.bookstore.requests.InventoryAddRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.validation.Valid;
-
 @Service
+@Slf4j
 public class InventoryService {
-
-    @Autowired
-    InventoryServiceHelper helper;
 
     @Autowired
     InventoryDAOIFace inventoryDAO;
 
-    public void saveInventory(Inventory inventory){
-        inventoryDAO.addInventory(inventory);
+    public void saveInventory(Inventory inventory) throws InternalServerException {
+        try{
+            inventoryDAO.saveInventory(inventory);
+        }
+        catch(DBException dbEx){
+            log.error("DBException while trying to save inventory : " + inventory,dbEx);
+            throw new InternalServerException();
+        }
     }
 
-    public Inventory getInventoryByBookId(Integer bookId){
+    public Inventory getInventoryByBookId(Integer bookId) throws InternalServerException{
 
-        return inventoryDAO.getInventoryByBookId(bookId);
+        try{
+            return inventoryDAO.getInventoryByBookId(bookId);
+        }
+        catch(DBException dbEx){
+            log.error("Exception while trying to get inventory by bookId : " + bookId,dbEx);
+            throw new InternalServerException();
+        }
 
+    }
+
+    public void deleteInventoryOfBook(Integer id) throws InternalServerException {
+
+        Inventory inventory = getInventoryByBookId(id);
+
+        try{
+            inventoryDAO.deleteInventory(inventory);
+        }
+        catch(DBException dBEx){
+            log.error("Exception while trying to delete inventory :" + inventory,dBEx);
+            throw new InternalServerException();
+        }
     }
 }

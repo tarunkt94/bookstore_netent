@@ -3,6 +3,8 @@ package com.bookstore.helpers;
 import com.bookstore.config.Constants;
 import com.bookstore.entity.Book;
 import com.bookstore.entity.Inventory;
+import com.bookstore.exceptions.DBException;
+import com.bookstore.exceptions.InternalServerException;
 import com.bookstore.exceptions.ResourceNotFoundException;
 import com.bookstore.exceptions.ValidationException;
 import com.bookstore.interfaces.BookDAOIFace;
@@ -12,6 +14,8 @@ import com.bookstore.requests.BookPartialSearchRequest;
 import com.bookstore.requests.BookUpdateRequest;
 import com.bookstore.responses.BookResponse;
 import com.bookstore.responses.MediaCoverageResponse;
+import com.bookstore.service.BooksService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -26,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Slf4j
 public class BookServiceHelper {
 
     @Autowired
@@ -34,10 +39,13 @@ public class BookServiceHelper {
     @Autowired
     RestTemplate restTemplate;
 
+    @Autowired
+    BooksService booksService;
+
     @Value("${media.coverage.url}")
     String mediaCoverageURL;
 
-    public void validateBookAddRequest(BookAddRequest bookAddRequest) throws ValidationException {
+    public void validateBookAddRequest(BookAddRequest bookAddRequest) throws ValidationException, InternalServerException {
 
         if(bookAddRequest.getAuthor()==null || bookAddRequest.getIsbn()==null
         || bookAddRequest.getTitle() ==null || bookAddRequest.getPrice()==null){
@@ -46,12 +54,23 @@ public class BookServiceHelper {
             throw new ValidationException(msg);
         }
 
-        Book book = bookDAO.getBookByISBN(bookAddRequest.getIsbn());
+        Book book = getBookByISBN(bookAddRequest.getIsbn());
+
         if(book!=null){
             throw new ValidationException("Book already exists in our system");
         }
 
         if(bookAddRequest.getPrice()<0) throw new ValidationException("Book Price cannot be negative");
+    }
+
+    private Book getBookByISBN(String isbn) throws InternalServerException {
+        try{
+            return bookDAO.getBookByISBN(isbn);
+        }
+        catch(DBException dbEx){
+            log.error("Exception while trying to get book with ISBN : " + isbn,dbEx);
+            throw new InternalServerException();
+        }
     }
 
     public Book getBookFromAddRequest(BookAddRequest bookAddRequest) {
@@ -65,12 +84,12 @@ public class BookServiceHelper {
         return book;
     }
 
-    public void validateBookUpdateRequest(Integer id) throws ResourceNotFoundException {
+    public void validateBookUpdateRequest(Integer id) throws ResourceNotFoundException, InternalServerException {
         validateBookExistsInDB(id);
     }
 
-    public void validateBookExistsInDB(Integer id) throws  ResourceNotFoundException{
-        Book bookInDb = bookDAO.getBook(id);
+    public void validateBookExistsInDB(Integer id) throws ResourceNotFoundException, InternalServerException {
+        Book bookInDb = booksService.getBookById(id);
         if(bookInDb==null) throw new ResourceNotFoundException();
     }
 
@@ -83,7 +102,7 @@ public class BookServiceHelper {
 
     }
 
-    public void validateBookDeleteRequest(Integer id) throws ResourceNotFoundException {
+    public void validateBookDeleteRequest(Integer id) throws ResourceNotFoundException, InternalServerException {
         validateBookExistsInDB(id);
     }
 
