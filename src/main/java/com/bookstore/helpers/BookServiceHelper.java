@@ -47,12 +47,7 @@ public class BookServiceHelper {
 
     public void validateBookAddRequest(BookAddRequest bookAddRequest) throws ValidationException, InternalServerException {
 
-        if(bookAddRequest.getAuthor()==null || bookAddRequest.getIsbn()==null
-        || bookAddRequest.getTitle() ==null || bookAddRequest.getPrice()==null){
-
-            String msg = "Author, ISBN number, Title, Price are mandatory for adding a book";
-            throw new ValidationException(msg);
-        }
+        validateAttributesOfBookAddRequest(bookAddRequest);
 
         Book book = getBookByISBN(bookAddRequest.getIsbn());
 
@@ -60,7 +55,20 @@ public class BookServiceHelper {
             throw new ValidationException("Book already exists in our system");
         }
 
+    }
+
+    public void validateAttributesOfBookAddRequest(BookAddRequest bookAddRequest) throws ValidationException {
+
+        if(bookAddRequest.getAuthor()==null || bookAddRequest.getIsbn()==null
+                || bookAddRequest.getTitle() ==null || bookAddRequest.getPrice()==null){
+
+            String msg = "Author, ISBN number, Title, Price are mandatory for adding a book";
+            throw new ValidationException(msg);
+        }
+
         if(bookAddRequest.getPrice()<0) throw new ValidationException("Book Price cannot be negative");
+
+        if(bookAddRequest.getInventory()<0) throw new ValidationException("Book inventory cannot be less than 0");
     }
 
     private Book getBookByISBN(String isbn) throws InternalServerException {
@@ -166,9 +174,10 @@ public class BookServiceHelper {
         return response;
     }
 
-    public void modifyRequest(BookPartialSearchRequest partialSearchRequest) {
+    public BookPartialSearchRequest modifyRequest(BookPartialSearchRequest partialSearchRequest) {
         if(partialSearchRequest.getAuthor()==null) partialSearchRequest.setAuthor(Constants.EMPTY_STRING);
         if(partialSearchRequest.getIsbn()==null) partialSearchRequest.setIsbn(Constants.EMPTY_STRING);
         if(partialSearchRequest.getTitle()==null) partialSearchRequest.setTitle(Constants.EMPTY_STRING);
+        return partialSearchRequest;
     }
 }
