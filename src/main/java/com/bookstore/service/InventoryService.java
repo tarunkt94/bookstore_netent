@@ -49,4 +49,14 @@ public class InventoryService {
             throw new InternalServerException();
         }
     }
+
+    public Inventory getBookInventoryForBuying(Integer bookId) throws InternalServerException {
+        try{
+            return inventoryDAO.getInventoryByBookIdWithLock(bookId);
+        }
+        catch(DBException dBEx){
+            log.error("Exception while trying to get inventory for bookId : " + bookId,dBEx);
+            throw new InternalServerException();
+        }
+    }
 }

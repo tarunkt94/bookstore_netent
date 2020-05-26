@@ -12,6 +12,7 @@ import com.bookstore.responses.ListBookResponse;
 import com.bookstore.responses.MediaCoverageResponse;
 import com.bookstore.responses.SuccessResponse;
 import com.bookstore.service.BooksService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,6 +22,7 @@ import java.util.List;
 @RestController
 @ResponseBody
 @RequestMapping(value = "/books")
+@Slf4j
 public class BooksController {
 
     @Autowired

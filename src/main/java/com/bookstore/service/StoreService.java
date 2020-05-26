@@ -26,13 +26,17 @@ public class StoreService {
 
         Book bookInDB = helper.validateRequestAndGetBook(buyBookRequest);
 
-        Inventory bookInventory = getBookInventory(bookInDB.getId());
+        Inventory bookInventory = getBookInventoryForBuying(bookInDB.getId());
 
         if(bookInventory.getNoOfCopies() < buyBookRequest.getNoOfCopies()) return helper.generateUnavailableResponse();
 
         decreaseInventory(bookInventory,buyBookRequest.getNoOfCopies());
 
         return helper.generateSuccessReponse();
+    }
+
+    private Inventory getBookInventoryForBuying(Integer id) throws InternalServerException{
+        return inventoryService.getBookInventoryForBuying(id);
     }
 
     private void decreaseInventory(Inventory bookInventory,Integer noOfCopiesToBuy) throws InternalServerException {

@@ -9,6 +9,8 @@ public interface InventoryDAOIFace {
 
     public Inventory getInventoryByBookId(Integer bookId) throws DBException;
 
+    public Inventory getInventoryByBookIdWithLock(Integer bookId) throws DBException;
+
     public void deleteInventory(Inventory inventory) throws DBException;
 
 }
