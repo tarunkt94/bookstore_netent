@@ -1,22 +1,15 @@
 package com.bookstore.service;
 
-import com.bookstore.entity.Book;
-import com.bookstore.entity.Inventory;
 import com.bookstore.exceptions.InternalServerException;
 import com.bookstore.exceptions.ValidationException;
 import com.bookstore.helpers.StoreServiceHelper;
 import com.bookstore.requests.BuyBookRequest;
-import com.bookstore.responses.BuyBookResponse;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
+import org.mockito.*;
 
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Mockito.mock;
+
 import static org.mockito.Mockito.when;
 
 public class StoreServiceTest {
@@ -24,91 +17,51 @@ public class StoreServiceTest {
     @InjectMocks
     StoreService storeService;
 
-    @Spy
+    @Mock
     StoreServiceHelper helper;
 
-    @Mock
-    BooksService bookService;
-
-    @Mock
-    InventoryService inventoryService;
 
     @Before
     public void init() {
         MockitoAnnotations.initMocks(this);
     }
 
-    @Test(expected = ValidationException.class)
-    public void testBuyBookValidations() throws ValidationException, InternalServerException, InterruptedException {
-
-        BuyBookRequest requestMock = new BuyBookRequest();
-
-        requestMock.setBookId(null);
-
-        try{
-            storeService.buyBook(requestMock);
-        }
-        catch(ValidationException ex){
-            Assert.assertEquals("bookId cannot be null in the request",ex.getMessage());
-            throw ex;
-        }
-
-        requestMock.setBookId(1);
-        requestMock.setNoOfCopies(-1);
-
-        try{
-            storeService.buyBook(requestMock);
-        }
-        catch(ValidationException ex){
-            Assert.assertEquals("Number of books to buy is invalid",ex.getMessage());
-            throw ex;
-        }
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testBuyBookValidationBookDoesntExist() throws ValidationException, InternalServerException, InterruptedException {
-
-        when(bookService.getBookById(anyInt())).thenReturn(null);
-
-        BuyBookRequest request = new BuyBookRequest();
-        request.setBookId(1);
-        request.setNoOfCopies(1);
-
-        try{
-            storeService.buyBook(request);
-        }
-        catch(ValidationException vEx){
-            Assert.assertEquals("Given bookId does not exist in our system",vEx.getMessage());
-            throw vEx;
-        }
-
-    }
-
     @Test
-    public void testBuyBookValidationNoOfCopies() throws ValidationException, InternalServerException, InterruptedException {
+    public void testBuyBookValidations() throws ValidationException, InternalServerException {
 
-        BuyBookRequest request = new BuyBookRequest();
-        Integer bookId = 1;
+        BuyBookRequest buyBookRequest = new BuyBookRequest();
 
-        request.setNoOfCopies(10);
-        request.setBookId(bookId);
+        when(helper.validateRequestAndGetBook(buyBookRequest)).thenThrow(new ValidationException("bookId cannot be null in the request"));
 
-        Book bookMock = new Book();
-        bookMock.setId(bookId);
+        try{
+            storeService.buyBook(buyBookRequest);
+        }
+        catch(Exception ex){
+            Assert.assertEquals("bookId cannot be null in the request",ex.getMessage());
+            Assert.assertEquals(ValidationException.class,ex.getClass());
+        }
 
-        Inventory mockInventory = new Inventory();
-        mockInventory.setBookId(bookId);
-        mockInventory.setNoOfCopies(1);
+        Mockito.reset(helper);
+        when(helper.validateRequestAndGetBook(buyBookRequest)).thenThrow(new ValidationException("Number of books to buy is invalid"));
 
-        when(helper.validateRequestAndGetBook(request)).thenReturn(bookMock);
+        try{
+            storeService.buyBook(buyBookRequest);
+        }
+        catch(Exception ex){
+            Assert.assertEquals("Number of books to buy is invalid",ex.getMessage());
+            Assert.assertEquals(ValidationException.class,ex.getClass());
+        }
 
-        when(bookService.getBookById(bookId)).thenReturn(bookMock);
-        when(inventoryService.getInventoryByBookId(bookId)).thenReturn(mockInventory);
+        Mockito.reset(helper);
+        when(helper.validateRequestAndGetBook(buyBookRequest)).thenThrow(new ValidationException("Given bookId does not exist in our system"));
 
-        BuyBookResponse buyBookResponse = storeService.buyBook(request);
+        try{
+            storeService.buyBook(buyBookRequest);
+        }
+        catch(Exception ex){
+            Assert.assertEquals("Given bookId does not exist in our system",ex.getMessage());
+            Assert.assertEquals(ValidationException.class,ex.getClass());
+        }
 
-        Assert.assertEquals("Not enough books available at the moment",buyBookResponse.getMsg());
-        Assert.assertEquals(false,buyBookResponse.isSuccess());
     }
-
 }

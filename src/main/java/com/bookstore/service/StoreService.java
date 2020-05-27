@@ -24,7 +24,7 @@ public class StoreService {
     @Autowired
     InventoryService inventoryService;
 
-    public BuyBookResponse buyBook(BuyBookRequest buyBookRequest) throws ValidationException, InternalServerException, InterruptedException {
+    public BuyBookResponse buyBook(BuyBookRequest buyBookRequest) throws ValidationException, InternalServerException {
 
         Book bookInDB = helper.validateRequestAndGetBook(buyBookRequest);
 

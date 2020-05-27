@@ -47,7 +47,7 @@ public class StoreServiceHelper {
         return booksService.getBookById(bookId);
     }
 
-    public BuyBookResponse generateUnavailableResponse() {
+    private BuyBookResponse generateUnavailableResponse() {
 
         BuyBookResponse buyBookResponse = new BuyBookResponse();
         buyBookResponse.setSuccess(false);
@@ -57,7 +57,7 @@ public class StoreServiceHelper {
 
     }
 
-    public BuyBookResponse generateSuccessReponse() {
+    private BuyBookResponse generateSuccessResponse() {
 
         BuyBookResponse buyBookResponse = new BuyBookResponse();
         buyBookResponse.setSuccess(true);
@@ -67,7 +67,7 @@ public class StoreServiceHelper {
     }
 
     @Transactional
-    public BuyBookResponse checkInventoryAndAct(Book bookInDB, BuyBookRequest buyBookRequest) throws InternalServerException, InterruptedException {
+    public BuyBookResponse checkInventoryAndAct(Book bookInDB, BuyBookRequest buyBookRequest) throws InternalServerException {
 
         Inventory bookInventory = getBookInventoryForBuying(bookInDB.getId());
 
@@ -75,7 +75,7 @@ public class StoreServiceHelper {
 
         decreaseInventory(bookInventory,buyBookRequest.getNoOfCopies());
 
-        return generateSuccessReponse();
+        return generateSuccessResponse();
     }
 
     private Inventory getBookInventoryForBuying(Integer id) throws InternalServerException{
