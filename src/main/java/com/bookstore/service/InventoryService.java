@@ -40,7 +40,7 @@ public class InventoryService {
     public void deleteInventoryOfBook(Integer id) throws InternalServerException {
 
         Inventory inventory = getInventoryByBookId(id);
-
+        if(inventory==null) return;
         try{
             inventoryDAO.deleteInventory(inventory);
         }

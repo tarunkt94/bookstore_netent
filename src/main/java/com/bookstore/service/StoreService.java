@@ -51,8 +51,4 @@ public class StoreService {
         if(bookInventory.getNoOfCopies()==noOfCopiesToBuy) return 1;
         return bookInventory.getNoOfCopies()-noOfCopiesToBuy;
     }
-
-    private Inventory getBookInventory(Integer id) throws InternalServerException {
-        return inventoryService.getInventoryByBookId(id);
-    }
 }

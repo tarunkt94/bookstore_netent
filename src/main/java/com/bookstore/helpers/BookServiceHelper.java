@@ -68,7 +68,8 @@ public class BookServiceHelper {
 
         if(bookAddRequest.getPrice()<0) throw new ValidationException("Book Price cannot be negative");
 
-        if(bookAddRequest.getInventory()<0) throw new ValidationException("Book inventory cannot be less than 0");
+        if(bookAddRequest.getInventory()!=null
+            && bookAddRequest.getInventory()<0) throw new ValidationException("Book inventory cannot be less than 0");
     }
 
     private Book getBookByISBN(String isbn) throws InternalServerException {
@@ -83,6 +84,7 @@ public class BookServiceHelper {
 
     public Book getBookFromAddRequest(BookAddRequest bookAddRequest) {
 
+        if(bookAddRequest==null) return null;
         Book book = new Book();
         book.setAuthor(bookAddRequest.getAuthor());
         book.setIsbn(bookAddRequest.getIsbn());

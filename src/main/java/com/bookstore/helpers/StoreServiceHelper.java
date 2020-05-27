@@ -24,7 +24,7 @@ public class StoreServiceHelper {
         Integer bookId = buyBookRequest.getBookId();
         if(bookId==null) throw new ValidationException("bookId cannot be null in the request");
 
-        if(buyBookRequest.getNoOfCopies() == null || buyBookRequest.getNoOfCopies() <=0)
+        if(buyBookRequest.getNoOfCopies() <=0)
             throw new ValidationException("Number of books to buy is invalid");
 
         Book book = booksService.getBookById(bookId);

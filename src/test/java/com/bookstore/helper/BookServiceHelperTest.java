@@ -13,42 +13,41 @@ import com.bookstore.requests.BookAddRequest;
 import com.bookstore.requests.BookPartialSearchRequest;
 import com.bookstore.service.BooksService;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class BookServiceHelperTest {
 
-    @Mock
+    @InjectMocks
     BookServiceHelper bookServiceHelper;
 
-    @InjectMocks
-    BookDAOIFace bookDAOIFace;
+    @Mock
+    BookDAO bookDAOIFace;
 
-    @InjectMocks
+    @Mock
     BooksService booksService;
+
+    private final String MOCK_ISBN = "mock";
+    private final String MOCK_TITLE = "mock";
+    private final String MOCK_AUTHOR = "mock";
+
+    @Before
+    public void init() throws DBException {
+        MockitoAnnotations.initMocks(this);
+    }
 
     @Test(expected = ValidationException.class)
     public void testValidateBookAddRequestNulls() throws ValidationException{
 
-        BookAddRequest addRequestMock = mock(BookAddRequest.class);
+        BookAddRequest addRequestMock = new BookAddRequest();
 
-        when(addRequestMock.getIsbn()).thenReturn(null);
-        when(addRequestMock.getAuthor()).thenReturn(null);
-        when(addRequestMock.getTitle()).thenReturn(null);
-        when(addRequestMock.getPrice()).thenReturn(null);
-        try{
-            bookServiceHelper.validateAttributesOfBookAddRequest(addRequestMock);
-        }
-        catch(ValidationException ex){
-            Assert.assertEquals("Author, ISBN number, Title, Price are mandatory for adding a book",ex.getMessage());
-            throw ex;
-        }
-
-        when(addRequestMock.getPrice()).thenReturn(-1.0F);
         try{
             bookServiceHelper.validateAttributesOfBookAddRequest(addRequestMock);
         }
@@ -62,12 +61,12 @@ public class BookServiceHelperTest {
     @Test(expected = ValidationException.class)
     public void testValidateBookAddRequestNegativePrice() throws ValidationException{
 
-        BookAddRequest addRequestMock = mock(BookAddRequest.class);
+        BookAddRequest addRequestMock = new BookAddRequest();
 
-        when(addRequestMock.getIsbn()).thenReturn("mock");
-        when(addRequestMock.getAuthor()).thenReturn("mock");
-        when(addRequestMock.getTitle()).thenReturn("mock");
-        when(addRequestMock.getPrice()).thenReturn(-1.0F);
+        addRequestMock.setAuthor(MOCK_AUTHOR);
+        addRequestMock.setTitle(MOCK_TITLE);
+        addRequestMock.setIsbn(MOCK_ISBN);
+        addRequestMock.setPrice(-1.0F);
 
         try{
             bookServiceHelper.validateAttributesOfBookAddRequest(addRequestMock);
@@ -81,13 +80,13 @@ public class BookServiceHelperTest {
     @Test(expected = ValidationException.class)
     public void testValidateBookAddRequestNegativeInventory() throws ValidationException{
 
-        BookAddRequest addRequestMock = mock(BookAddRequest.class);
+        BookAddRequest addRequestMock = new BookAddRequest();
 
-        when(addRequestMock.getIsbn()).thenReturn("mock");
-        when(addRequestMock.getAuthor()).thenReturn("mock");
-        when(addRequestMock.getTitle()).thenReturn("mock");
-        when(addRequestMock.getPrice()).thenReturn(1.0F);
-        when(addRequestMock.getInventory()).thenReturn(-1);
+        addRequestMock.setPrice(1.0F);
+        addRequestMock.setAuthor(MOCK_AUTHOR);
+        addRequestMock.setTitle(MOCK_TITLE);
+        addRequestMock.setIsbn(MOCK_ISBN);
+        addRequestMock.setInventory(-1);
 
         try{
             bookServiceHelper.validateAttributesOfBookAddRequest(addRequestMock);
@@ -101,16 +100,14 @@ public class BookServiceHelperTest {
     @Test(expected = ValidationException.class)
     public void testValidateBookAddRequestBookAlreadyExists() throws ValidationException, DBException {
 
-        BookAddRequest addRequestMock = mock(BookAddRequest.class);
+        BookAddRequest addRequestMock = new BookAddRequest();
 
-        Book bookMock = mock(Book.class);
+        addRequestMock.setPrice(1.0F);
+        addRequestMock.setAuthor(MOCK_AUTHOR);
+        addRequestMock.setTitle(MOCK_TITLE);
+        addRequestMock.setIsbn(MOCK_ISBN);
 
-        when(addRequestMock.getIsbn()).thenReturn("mock");
-        when(addRequestMock.getAuthor()).thenReturn("mock");
-        when(addRequestMock.getTitle()).thenReturn("mock");
-        when(addRequestMock.getPrice()).thenReturn(1.0F);
-
-        when(bookDAOIFace.getBookByISBN("mock")).thenReturn(bookMock);
+        Mockito.doReturn(new Book()).when(bookDAOIFace).getBookByISBN(MOCK_ISBN);
 
         try{
             bookServiceHelper.validateAttributesOfBookAddRequest(addRequestMock);
@@ -123,24 +120,18 @@ public class BookServiceHelperTest {
     }
 
     @Test
-    public void testValidateBookAddRequestHappyCase(){
+    public void testValidateBookAddRequestHappyCase() throws DBException, ValidationException {
 
-        BookAddRequest addRequestMock = mock(BookAddRequest.class);
+        BookAddRequest addRequestMock = new BookAddRequest();
 
-        Book bookMock = mock(Book.class);
+        addRequestMock.setPrice(1.0F);
+        addRequestMock.setAuthor(MOCK_AUTHOR);
+        addRequestMock.setTitle(MOCK_TITLE);
+        addRequestMock.setIsbn(MOCK_ISBN);
 
-        when(addRequestMock.getIsbn()).thenReturn("mock");
-        when(addRequestMock.getAuthor()).thenReturn("mock");
-        when(addRequestMock.getTitle()).thenReturn("mock");
-        when(addRequestMock.getPrice()).thenReturn(1.0F);
+        when(bookDAOIFace.getBookByISBN(MOCK_ISBN)).thenReturn(new Book());
+        bookServiceHelper.validateAttributesOfBookAddRequest(addRequestMock);
 
-        try{
-            when(bookDAOIFace.getBookByISBN("mock")).thenReturn(bookMock);
-            bookServiceHelper.validateAttributesOfBookAddRequest(addRequestMock);
-        }
-        catch(Exception ex){
-            Assert.fail("Exception should not have been thrown");
-        }
     }
 
     @Test(expected = ResourceNotFoundException.class)
@@ -155,11 +146,7 @@ public class BookServiceHelperTest {
     @Test
     public void testModifyRequest(){
 
-        BookPartialSearchRequest mockRequest = mock(BookPartialSearchRequest.class);
-
-        when(mockRequest.getAuthor()).thenReturn(null);
-        when(mockRequest.getIsbn()).thenReturn(null);
-        when(mockRequest.getTitle()).thenReturn(null);
+        BookPartialSearchRequest mockRequest = new BookPartialSearchRequest(null,null,null);
 
         BookPartialSearchRequest response  = bookServiceHelper.modifyRequest(mockRequest);
 
