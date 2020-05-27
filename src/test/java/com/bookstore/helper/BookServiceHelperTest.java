@@ -98,7 +98,7 @@ public class BookServiceHelperTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void testValidateBookAddRequestBookAlreadyExists() throws ValidationException, DBException {
+    public void testValidateBookAddRequestBookAlreadyExists() throws ValidationException, InternalServerException,DBException {
 
         BookAddRequest addRequestMock = new BookAddRequest();
 
@@ -110,7 +110,7 @@ public class BookServiceHelperTest {
         Mockito.doReturn(new Book()).when(bookDAOIFace).getBookByISBN(MOCK_ISBN);
 
         try{
-            bookServiceHelper.validateAttributesOfBookAddRequest(addRequestMock);
+            bookServiceHelper.validateBookAddRequest(addRequestMock);
         }
         catch(ValidationException ex){
             Assert.assertEquals("Book already exists in our system",ex.getMessage());

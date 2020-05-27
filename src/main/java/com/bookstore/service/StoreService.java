@@ -17,9 +17,6 @@ public class StoreService {
     StoreServiceHelper helper;
 
     @Autowired
-    BooksService booksService;
-
-    @Autowired
     InventoryService inventoryService;
 
     public synchronized BuyBookResponse buyBook(BuyBookRequest buyBookRequest) throws ValidationException, InternalServerException {

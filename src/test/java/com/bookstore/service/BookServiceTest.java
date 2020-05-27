@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -27,6 +28,9 @@ public class BookServiceTest {
 
     @Mock
     BookDAO bookDAO;
+
+    @Spy
+    BookServiceHelper bookServiceHelper;
 
     @Before
     public void init() {

@@ -13,8 +13,9 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 
-import static org.mockito.Matchers.booleanThat;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -23,7 +24,7 @@ public class StoreServiceTest {
     @InjectMocks
     StoreService storeService;
 
-    @Mock
+    @Spy
     StoreServiceHelper helper;
 
     @Mock
@@ -67,11 +68,7 @@ public class StoreServiceTest {
     @Test(expected = ValidationException.class)
     public void testBuyBookValidationBookDoesntExist() throws ValidationException,InternalServerException{
 
-        BooksService booksService = mock(BooksService.class);
-
-        Integer bookId = 1;
-
-        when(booksService.getBookById(bookId)).thenReturn(null);
+        when(bookService.getBookById(anyInt())).thenReturn(null);
 
         BuyBookRequest request = new BuyBookRequest();
         request.setBookId(1);

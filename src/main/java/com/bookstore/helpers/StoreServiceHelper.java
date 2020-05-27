@@ -27,10 +27,14 @@ public class StoreServiceHelper {
         if(buyBookRequest.getNoOfCopies() <=0)
             throw new ValidationException("Number of books to buy is invalid");
 
-        Book book = booksService.getBookById(bookId);
+        Book book = getBookFromBookService(bookId);
         if(book==null) throw new ValidationException("Given bookId does not exist in our system");
 
         return book;
+    }
+
+    private Book getBookFromBookService(Integer bookId) throws InternalServerException {
+        return booksService.getBookById(bookId);
     }
 
     public BuyBookResponse generateUnavailableResponse() {
