@@ -39,7 +39,7 @@ public class StoreServiceTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void testBuyBookValidations() throws ValidationException, InternalServerException {
+    public void testBuyBookValidations() throws ValidationException, InternalServerException, InterruptedException {
 
         BuyBookRequest requestMock = new BuyBookRequest();
 
@@ -66,7 +66,7 @@ public class StoreServiceTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void testBuyBookValidationBookDoesntExist() throws ValidationException,InternalServerException{
+    public void testBuyBookValidationBookDoesntExist() throws ValidationException, InternalServerException, InterruptedException {
 
         when(bookService.getBookById(anyInt())).thenReturn(null);
 
@@ -85,7 +85,7 @@ public class StoreServiceTest {
     }
 
     @Test
-    public void testBuyBookValidationNoOfCopies() throws ValidationException,InternalServerException{
+    public void testBuyBookValidationNoOfCopies() throws ValidationException, InternalServerException, InterruptedException {
 
         BuyBookRequest request = new BuyBookRequest();
         Integer bookId = 1;

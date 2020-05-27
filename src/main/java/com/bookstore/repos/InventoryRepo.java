@@ -15,7 +15,6 @@ public interface InventoryRepo  extends JpaRepository<Inventory,Integer> {
 
     public Inventory findByBookId(Integer bookId);
 
-
     @Lock(value = LockModeType.PESSIMISTIC_WRITE)
     @QueryHints({@QueryHint(name = "javax.persistence.lock.timeout", value = "3000")})
     @Query(value = "select inv from Inventory  inv where inv.bookId  = ?1")

@@ -1,16 +1,23 @@
 package com.bookstore.helpers;
 
 import com.bookstore.entity.Book;
+import com.bookstore.entity.Inventory;
 import com.bookstore.exceptions.InternalServerException;
 import com.bookstore.exceptions.ValidationException;
 import com.bookstore.interfaces.BookDAOIFace;
 import com.bookstore.requests.BuyBookRequest;
 import com.bookstore.responses.BuyBookResponse;
 import com.bookstore.service.BooksService;
+import com.bookstore.service.InventoryService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+import java.util.concurrent.TimeUnit;
+
 @Service
+@Slf4j
 public class StoreServiceHelper {
 
     @Autowired
@@ -18,6 +25,9 @@ public class StoreServiceHelper {
 
     @Autowired
     BooksService booksService;
+
+    @Autowired
+    InventoryService inventoryService;
 
     public Book validateRequestAndGetBook(BuyBookRequest buyBookRequest) throws ValidationException, InternalServerException {
 
@@ -55,4 +65,34 @@ public class StoreServiceHelper {
 
         return buyBookResponse;
     }
+
+    @Transactional
+    public BuyBookResponse checkInventoryAndAct(Book bookInDB, BuyBookRequest buyBookRequest) throws InternalServerException, InterruptedException {
+
+        Inventory bookInventory = getBookInventoryForBuying(bookInDB.getId());
+
+        if(bookInventory.getNoOfCopies() < buyBookRequest.getNoOfCopies()) return generateUnavailableResponse();
+
+        decreaseInventory(bookInventory,buyBookRequest.getNoOfCopies());
+
+        return generateSuccessReponse();
+    }
+
+    private Inventory getBookInventoryForBuying(Integer id) throws InternalServerException{
+        return inventoryService.getBookInventoryForBuying(id);
+    }
+
+    private void decreaseInventory(Inventory bookInventory,Integer noOfCopiesToBuy) throws InternalServerException {
+
+        int finalNumberOfCopies = getNoOfCopiesAfterBuying(bookInventory,noOfCopiesToBuy);
+        bookInventory.setNoOfCopies(finalNumberOfCopies);
+        inventoryService.saveInventory(bookInventory);
+
+    }
+
+    private int getNoOfCopiesAfterBuying(Inventory bookInventory, Integer noOfCopiesToBuy) {
+        if(bookInventory.getNoOfCopies()==noOfCopiesToBuy) return 1;
+        return bookInventory.getNoOfCopies()-noOfCopiesToBuy;
+    }
+
 }

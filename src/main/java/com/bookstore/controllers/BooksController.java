@@ -29,7 +29,6 @@ public class BooksController {
     BooksService booksService;
 
     @RequestMapping(method = RequestMethod.POST)
-    @Transactional
     public BookResponse addBook(@RequestBody  BookAddRequest bookAddRequest) throws ValidationException, InternalServerException {
         return booksService.addBook(bookAddRequest);
     }
@@ -49,14 +48,12 @@ public class BooksController {
     }
 
     @RequestMapping(method = RequestMethod.PATCH,value = "/{id}")
-    @Transactional
     public SuccessResponse updateBook(@PathVariable Integer id, @RequestBody BookUpdateRequest bookUpdateRequest) throws ResourceNotFoundException, InternalServerException {
         booksService.updateBook(id,bookUpdateRequest);
         return new SuccessResponse();
     }
 
     @RequestMapping(value = "/{id}",method = RequestMethod.DELETE)
-    @Transactional
     public SuccessResponse deleteBook(@PathVariable Integer id) throws ResourceNotFoundException, InternalServerException {
         booksService.deleteBook(id);
         return new SuccessResponse();

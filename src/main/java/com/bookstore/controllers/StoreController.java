@@ -22,8 +22,7 @@ public class StoreController {
     StoreService storeService;
 
     @RequestMapping(method = RequestMethod.POST,value = "/buyBook")
-    @Transactional
-    public BuyBookResponse buyBook(@RequestBody BuyBookRequest buyBookRequest) throws ValidationException, InternalServerException {
+    public BuyBookResponse buyBook(@RequestBody BuyBookRequest buyBookRequest) throws ValidationException, InternalServerException, InterruptedException {
         return storeService.buyBook(buyBookRequest);
     }
 
