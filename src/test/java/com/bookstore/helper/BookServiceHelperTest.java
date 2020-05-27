@@ -39,7 +39,7 @@ public class BookServiceHelperTest {
     private final String MOCK_AUTHOR = "mock";
 
     @Before
-    public void init() throws DBException {
+    public void init() {
         MockitoAnnotations.initMocks(this);
     }
 

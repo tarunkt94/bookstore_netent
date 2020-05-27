@@ -1,6 +1,7 @@
 package com.bookstore.service;
 
 import com.bookstore.config.Constants;
+import com.bookstore.daos.BookDAO;
 import com.bookstore.exceptions.DBException;
 import com.bookstore.exceptions.InternalServerException;
 import com.bookstore.exceptions.ResourceNotFoundException;
@@ -9,9 +10,11 @@ import com.bookstore.helpers.BookServiceHelper;
 import com.bookstore.interfaces.BookDAOIFace;
 import com.bookstore.responses.MediaCoverageResponse;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -19,12 +22,16 @@ import static org.mockito.Mockito.when;
 
 public class BookServiceTest {
 
-    @Mock
+    @InjectMocks
     BooksService booksService;
 
-    @InjectMocks
-    BookDAOIFace bookDAO;
+    @Mock
+    BookDAO bookDAO;
 
+    @Before
+    public void init() {
+        MockitoAnnotations.initMocks(this);
+    }
 
     @Test(expected = InternalServerException.class)
     public  void testGetBookById() throws InternalServerException,DBException{
@@ -67,8 +74,8 @@ public class BookServiceTest {
 
         MediaCoverageResponse response = booksService.getMediaCoverage(mockISBN);
 
-        Assert.assertEquals(response.isSuccess(),false);
-        Assert.assertEquals(response.getMsg(),"No book exists in the system with given ISBN");
+        Assert.assertEquals(false,response.isSuccess());
+        Assert.assertEquals("No book exists in the system with given ISBN",response.getMsg());
 
     }
 

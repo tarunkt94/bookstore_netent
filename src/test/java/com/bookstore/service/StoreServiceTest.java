@@ -23,7 +23,7 @@ public class StoreServiceTest {
     @InjectMocks
     StoreService storeService;
 
-    @InjectMocks
+    @Mock
     StoreServiceHelper helper;
 
     @Mock
