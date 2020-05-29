@@ -172,7 +172,7 @@ public class BookServiceHelper {
         }
         catch(Exception ex){
             //log error message
-            return response;
+            return null;
         }
     }
 
@@ -184,11 +184,19 @@ public class BookServiceHelper {
         return mediaCoverageResponse;
     }
 
-    public MediaCoverageResponse generateMediaCoverageResponse(List<MediaCoverage> mediaCoverageList) {
+    public MediaCoverageResponse generateMediaCoverageSuccessResponse(List<MediaCoverage> mediaCoverageList) {
 
         MediaCoverageResponse response = new MediaCoverageResponse();
         response.setSuccess(true);
         response.setTitleList(getTitleList(mediaCoverageList));
+        return response;
+    }
+
+    public MediaCoverageResponse generateMediaCoverageFailureResponse() {
+
+        MediaCoverageResponse response = new MediaCoverageResponse();
+        response.setSuccess(false);
+        response.setMsg("Error while getting information regarding media coverage");
         return response;
     }
 

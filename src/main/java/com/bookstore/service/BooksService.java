@@ -173,13 +173,15 @@ public class BooksService {
 
         List<MediaCoverage> mediaCoverageList = getMediaCoverage(bookInDB);
 
-        return bookServiceHelper.generateMediaCoverageResponse(mediaCoverageList);
+        if(mediaCoverageList==null) return bookServiceHelper.generateMediaCoverageFailureResponse();
+        else return bookServiceHelper.generateMediaCoverageSuccessResponse(mediaCoverageList);
     }
 
     private List<MediaCoverage> getMediaCoverage(Book bookInDB) {
 
         List<MediaCoverage> allMediaCoverage = bookServiceHelper.getAllMediaCoverage();
 
+        if(allMediaCoverage==null) return null;
         List<MediaCoverage> response =  new ArrayList<>();
 
         for(MediaCoverage mediaCoverage : allMediaCoverage){
