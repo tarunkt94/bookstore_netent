@@ -1,6 +1,6 @@
 ### Building the project
 
-After the pulling the repository, go to the base of the repository and run
+After the pulling the repository, go into the repository and run
 
 ```
 docker build ./ -t bookstoreapp
