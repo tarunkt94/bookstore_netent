@@ -1,4 +1,4 @@
-###Building the project
+### Building the project
 
 After the pulling the repository, go to the base of the repository and run
 
@@ -15,7 +15,7 @@ user : postgres
 password : postgres 
 ```
 
-###Design of the Project
+### Design of the Project
 
 The BookStore contains two tables, `table: books` for storing information about the books
 and `table: inventory` for storing inventory information of the books
@@ -45,7 +45,7 @@ There are two main controller.
 `Store` Controller which exposes an API to buy books
 
 
-####Books Controller
+#### Books Controller
 
 
 `POST /books`
