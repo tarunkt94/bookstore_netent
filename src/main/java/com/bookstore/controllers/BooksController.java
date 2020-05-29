@@ -48,7 +48,7 @@ public class BooksController {
     }
 
     @RequestMapping(method = RequestMethod.PATCH,value = "/{id}")
-    public SuccessResponse updateBook(@PathVariable Integer id, @RequestBody BookUpdateRequest bookUpdateRequest) throws ResourceNotFoundException, InternalServerException {
+    public SuccessResponse updateBook(@PathVariable Integer id, @RequestBody BookUpdateRequest bookUpdateRequest) throws ResourceNotFoundException, InternalServerException, ValidationException {
         booksService.updateBook(id,bookUpdateRequest);
         return new SuccessResponse();
     }

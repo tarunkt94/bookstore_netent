@@ -5,7 +5,7 @@ import lombok.ToString;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "books",schema = "bookstore")
+@Table(name = "books",schema = "public")
 @ToString
 public class Book {
 

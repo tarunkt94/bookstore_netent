@@ -29,6 +29,8 @@ public class BookServiceTest {
     @Mock
     BookDAO bookDAO;
 
+    @Spy
+    BookServiceHelper helper;
 
     @Before
     public void init() {

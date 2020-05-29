@@ -86,7 +86,7 @@ public class BookServiceHelperTest {
         addRequestMock.setAuthor(MOCK_AUTHOR);
         addRequestMock.setTitle(MOCK_TITLE);
         addRequestMock.setIsbn(MOCK_ISBN);
-        addRequestMock.setInventory(-1);
+        addRequestMock.setNoOfCopies(-1);
 
         try{
             bookServiceHelper.validateAttributesOfBookAddRequest(addRequestMock);

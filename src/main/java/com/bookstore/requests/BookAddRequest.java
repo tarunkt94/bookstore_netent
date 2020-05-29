@@ -6,7 +6,7 @@ public class BookAddRequest {
     private String title;
     private String author;
     private Float price;
-    private Integer inventory;
+    private Integer noOfCopies;
 
     public String getIsbn() {
         return isbn;
@@ -40,11 +40,11 @@ public class BookAddRequest {
         this.price = price;
     }
 
-    public Integer getInventory() {
-        return inventory;
+    public Integer getNoOfCopies() {
+        return noOfCopies;
     }
 
-    public void setInventory(Integer inventory) {
-        this.inventory = inventory;
+    public void setNoOfCopies(Integer noOfCopies) {
+        this.noOfCopies = noOfCopies;
     }
 }

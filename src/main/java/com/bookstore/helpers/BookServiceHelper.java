@@ -68,8 +68,8 @@ public class BookServiceHelper {
 
         if(bookAddRequest.getPrice()<0) throw new ValidationException("Book Price cannot be negative");
 
-        if(bookAddRequest.getInventory()!=null
-            && bookAddRequest.getInventory()<0) throw new ValidationException("Book inventory cannot be less than 0");
+        if(bookAddRequest.getNoOfCopies()!=null
+            && bookAddRequest.getNoOfCopies()<0) throw new ValidationException("Book inventory cannot be less than 0");
     }
 
     private Book getBookByISBN(String isbn) throws InternalServerException {
@@ -94,8 +94,30 @@ public class BookServiceHelper {
         return book;
     }
 
-    public void validateBookUpdateRequest(Integer id) throws ResourceNotFoundException, InternalServerException {
+    public void validateBookUpdateRequest(Integer id, BookUpdateRequest bookUpdateRequest) throws ResourceNotFoundException, InternalServerException, ValidationException {
         validateBookExistsInDB(id);
+        validateISBNDoesntExist(id,bookUpdateRequest);
+        validateInventoryInUpdateRequest(bookUpdateRequest);
+    }
+
+    private void validateISBNDoesntExist(Integer id, BookUpdateRequest bookUpdateRequest) throws InternalServerException, ValidationException {
+        if(bookUpdateRequest.getIsbn()==null) return;
+        Book bookInDB;
+        try{
+            bookInDB = bookDAO.getBookByISBN(bookUpdateRequest.getIsbn());
+        }
+        catch(DBException dbEx){
+            log.error("Exception while trying to get book by ISBN",dbEx);
+            throw new InternalServerException();
+        }
+
+        if(bookInDB.getId()==id) return;
+        else throw new ValidationException("Another book already exists in the system with the given ISBN");
+    }
+
+    private void validateInventoryInUpdateRequest(BookUpdateRequest bookUpdateRequest) throws ValidationException {
+        Integer inventory = bookUpdateRequest.getNoOfCopies();
+        if(inventory!=null && inventory < 0) throw new ValidationException("No Of Copies cannot be negative number in the request");
     }
 
     public void validateBookExistsInDB(Integer id) throws ResourceNotFoundException, InternalServerException {
@@ -120,7 +142,7 @@ public class BookServiceHelper {
 
         Inventory inventory = new Inventory();
         inventory.setBookId(bookInDB.getId());
-        inventory.setNoOfCopies(bookAddRequest.getInventory()!=null ? bookAddRequest.getInventory() : 0);
+        inventory.setNoOfCopies(bookAddRequest.getNoOfCopies()!=null ? bookAddRequest.getNoOfCopies() : 0);
 
         return  inventory;
     }

@@ -107,12 +107,26 @@ public class BooksService {
         return response;
     }
 
-    public void updateBook(Integer id, BookUpdateRequest bookUpdateRequest) throws ResourceNotFoundException, InternalServerException {
+    public void updateBook(Integer bookId, BookUpdateRequest bookUpdateRequest) throws ResourceNotFoundException, InternalServerException, ValidationException {
 
-        bookServiceHelper.validateBookUpdateRequest(id);
+        bookServiceHelper.validateBookUpdateRequest(bookId,bookUpdateRequest);
 
+        updateBookDetails(bookId,bookUpdateRequest);
+        if(bookUpdateRequest.getNoOfCopies()!=null)updateInventoryDetails(bookId,bookUpdateRequest);
+
+    }
+
+    private void updateInventoryDetails(Integer bookId, BookUpdateRequest bookUpdateRequest) throws InternalServerException {
+
+        Inventory inventory = inventoryService.getInventoryByBookId(bookId);
+        inventory.setNoOfCopies(bookUpdateRequest.getNoOfCopies());
+        inventoryService.saveInventory(inventory);
+
+    }
+
+    private void updateBookDetails(Integer bookId, BookUpdateRequest bookUpdateRequest) throws InternalServerException {
         try{
-            Book bookInDb = bookDAO.getBook(id);
+            Book bookInDb = bookDAO.getBook(bookId);
             bookServiceHelper.updateBookDetails(bookInDb,bookUpdateRequest);
             bookDAO.saveBook(bookInDb);
         }
