@@ -111,7 +111,7 @@ public class BookServiceHelper {
             throw new InternalServerException();
         }
 
-        if(bookInDB.getId()==id) return;
+        if(bookInDB == null || bookInDB.getId()==id) return;
         else throw new ValidationException("Another book already exists in the system with the given ISBN");
     }
 
