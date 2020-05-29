@@ -2,8 +2,10 @@
 
 After the pulling the repository, go to the base of the repository and run
 
-`docker build ./ -t bookstoreapp`
-`docker-compose up`
+```
+docker build ./ -t bookstoreapp
+docker-compose up
+```
 
 This starts the SpringBoot service on port 8080 while connecting to the postgres database which runs on a different docker container
 
@@ -20,7 +22,8 @@ password : postgres
 The BookStore contains two tables, `table: books` for storing information about the books
 and `table: inventory` for storing inventory information of the books
 
-```create table  if not exists public.books (
+```
+create table  if not exists public.books (
    
        id serial  primary  key  not null,
        title varchar not null,
@@ -42,6 +45,7 @@ and `table: inventory` for storing inventory information of the books
 There are two main controller.
 
 `Books` Controller for storing information about the Books(Title,Author,Price,ISBN, No of copies)
+
 `Store` Controller which exposes an API to buy books
 
 
@@ -89,7 +93,7 @@ public class BookResponse {
     private Integer noOfCopies;
 }
 ```
-
+-------------------
 
 `GET /books/{id}`
 
@@ -113,6 +117,7 @@ public class BookResponse {
 }
 ```
 
+-------------------
 
 `GET /books`
 
@@ -152,6 +157,9 @@ public class BookResponse {
 **Future Considerations** : The API can be paginated as an enhancement when required
 
 
+-------------------
+
+
 `PATCH /books/{id}`
 
  ```Request Body :
@@ -184,6 +192,8 @@ unforeseen error
 Updates all the data in the system according to the request sent and sends `200 OK` in case of successful
 request and execution
 
+-------------------
+
 
 `DELETE /books/{id}`
 
@@ -197,6 +207,7 @@ unforeseen error
 Sends `200 OK` in case of successful execution
 
 `GET /books/mediaCoverage`
+
 `Request Param : String isbn (Mandatory)`
 
 ```Response Body
@@ -216,28 +227,37 @@ In all other cases, the system sens a `200 OK` response with varying response bo
 - Case : `isbn` doesnt exist in the system
 
 ```$xslt
+{
        success  :false,
        msg : No book exists in the system with given ISBN
+
+]
 ```
 
 - Case : Error while trying to reach the URL where media coverage is fethced from
 
 ```$xslt
+{       
        success  :false,
        msg : Error while getting information regarding media coverage
+}
 ```
 
 - Case : All success 
 
 ```$xslt
+{
     success : true,
     titleList : <list of titles>
+}
 ```
 
+-------------------
 
 
 
 #### Store Controller
+
 
 `POST /store/buyBook`
 
@@ -261,16 +281,20 @@ In all other cases , the service sends `200 OK` with varying response bodies
 - Case : Enough books are present in the inventory
 
 ```$xslt
+{
     success : true,
     msg : Books bought successfully
+}
 
 ```
 
 - Case : Not enough books present in the inventory as per request
 
 ```$xslt
+{
     success : true,
     msg : Not enough books available at the moment
+}
 
 ```
 
